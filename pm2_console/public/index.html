@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src * 'unsafe-inline'; media-src *; img-src * data: content: blob:;">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+
+  <link rel="stylesheet" href="css/start.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/spinkit/2.0.1/spinkit.min.css" />
+  <script src="js/methods_bootstrap.js"></script>
+  <script src="js/components_bootstrap.js"></script>
+  <script src="js/components_utils.js"></script>
+  <script src="js/vue_utils.js"></script>
+  <script src="js/gql_utils.js"></script>
+
+  <script src="js/remoteconsole.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vconsole/dist/vconsole.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuex@3.x/dist/vuex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-router@3.x/dist/vue-router.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.7.7/dat.gui.min.js"></script>
+
+  <title>PM2 Console</title>
+</head>
+<body>
+<!--
+    <div id="loader-background">
+      <div class="sk-plane sk-center"></div>
+    </div>
+-->
+    <div id="top" class="container">
+      <h1>PM2 - Process Management</h1>
+      <br>
+      <button class="btn btn-default" v-on:click="proc_list_update()">リスト更新</button>
+      <table class="table table-striped">
+          <thead>
+              <tr><th>id</th><th>name</th><th>status</th><th>memory</th><th>cpu</th><th>pm_uptime</th><th>restart_time</th><th>unstable_restarts</th><th>ログ</th><th>再起動</th><th>停止</th></tr>
+          </thead>
+          <tbody>
+              <tr v-for="(process, index) in proc_list">
+                  <td>{{process.pm_id}}</td>
+                  <td><a v-on:click="proc_describe(process.pm_id)">{{process.name}}</a></td><td>{{process.pm2_env.status}}</td><td>{{Math.ceil(process.monit.memory/1000)}} KB</td><td>{{process.monit.cpu}} %</td>
+                  <td>{{new Date(process.pm2_env.pm_uptime).toLocaleString()}}</td><td>{{process.pm2_env.restart_time}}</td><td>{{process.pm2_env.unstable_restarts}}</td>
+                  <td><button class="btn btn-sm btn-default" v-on:click="start_proc_view_log(process.pm_id, process.name)">ログ</button></td>
+                  <td><button class="btn btn-sm btn-default" v-on:click="proc_restart(process.pm_id)">再起動</button></td>
+                  <td><button class="btn btn-sm btn-default" v-on:click="proc_stop(process.pm_id)">停止</button></td>
+              </tr>
+          </tbody>
+      </table>
+
+
+      <div class="modal fade" id="proc-log">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">{{log_pm2_name}}</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-inline">
+                        <button class="btn btn-default" v-on:click="proc_view_log">View</button>
+                        <label>type</label> <select class="form-control" v-model="log_type">
+                            <option value="out">out</option>
+                            <option value="error">error</option>
+                        </select>
+                        <label>order</label> <select class="form-control" v-model="log_order">
+                            <option value="head">head</option>
+                            <option value="tail">tail</option>
+                        </select>
+                        <label>num</label> <input type="number" class="form-control" v-model.number="log_num">
+                        <button class="btn btn-default pull-right" v-on:click="proc_get_log">File</button>
+                    </div>
+                    <br>
+
+                    <textarea class="form-control" rows="20" readonly>{{log_content}}</textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default btn-sm" v-on:click="dialog_close('#proc-log')">閉じる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+      <div class="modal fade" id="proc-detail">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" v-if="proc_detail">
+                <div class="modal-header">
+                    <h4 class="modal-title"><label>name</label> {{proc_detail.name}}</h4>
+                </div>
+                <div class="modal-body">
+
+                    <span class="form-group form-inline">
+                        <label>status</label> {{proc_detail.pm2_env.status}}
+                    </span><br>
+                    <span class="form-group form-inline">
+                        <label>pid</label> {{proc_detail.pid}}
+                    </span><br>
+                    <span class="form-group form-inline">
+                        <label>pm_id</label> {{proc_detail.pm_id}}
+                    </span><br>
+                    <span class="form-group form-inline">
+                        <label>memory</label> {{proc_detail.monit.memory}}
+                    </span><br>
+                    <span class="form-group form-inline">
+                        <label>cpu</label> {{proc_detail.monit.cpu}}
+                    </span><br>
+                    <span class="form-group">
+                        <label>pm_cwd</label> {{proc_detail.pm2_env.pm_cwd}}
+                    </span><br>
+                    <span class="form-group">
+                        <label>pm_exec_path</label> {{proc_detail.pm2_env.pm_exec_path}}
+                    </span><br>
+                    <span class="form-group">
+                        <label>exec_interpreter</label> {{proc_detail.pm2_env.exec_interpreter}}
+                    </span><br>
+                    <span class="form-group">
+                        <label>exec_mode</label> {{proc_detail.pm2_env.exec_mode}}
+                    </span><br>
+                    <span class="form-group">
+                        <label>node_version</label> {{proc_detail.pm2_env.node_version}}
+                    </span><br>
+                    <span class="form-group">
+                        <label>uername</label> {{proc_detail.pm2_env.username}}
+                    </span><br>
+                    <span class="form-group">
+                        <label>pm_uptime</label> {{new Date(proc_detail.pm2_env.pm_uptime).toLocaleString()}}
+                    </span><br>
+                    <span class="form-group form-inline">
+                        <label>unstable_restarts</label> {{proc_detail.pm2_env.unstable_restarts}}
+                    </span><br>
+                    <span class="form-group form-inline">
+                        <label>restart_time</label> {{proc_detail.pm2_env.restart_time}}
+                    </span><br>
+                    <span class="form-group form-inline">
+                        <label>instances</label> {{proc_detail.pm2_env.instances}}
+                    </span><br>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                <a href="#detail_env" data-toggle="collapse">
+                                    env
+                                </a>
+                            </h3>
+                        </div>
+                        <div id="detail_env" class="panel-coppapse collapse">
+                            <div class="panel-body">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr><th>name</th><th>value</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(item, key) in proc_detail.pm2_env.env">
+                                            <td>{{key}}</td><td>{{item}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default btn-sm" v-on:click="dialog_close('#proc-detail')">閉じる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <router-view></router-view>
+      
+        <!-- for progress-dialog -->
+        <progress-dialog v-bind:title="progress_title"></progress-dialog>
+    </div>
+
+    <script src="js/store.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/start.js"></script>
+</body>
