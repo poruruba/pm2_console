@@ -28,6 +28,7 @@ var vue_options = {
         start_proc_view_log: function(pm2_id, pm2_name){
             this.log_pm2_name = pm2_name;
             this.log_pm2_id = pm2_id;
+            this.log_content = "";
             this.dialog_open("#proc-log");
         },
         proc_view_log: async function(){
