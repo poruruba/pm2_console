@@ -1,0 +1,363 @@
+swagger: "2.0"
+info:
+  version: first version
+  title: Lambda Laboratory Server
+host: localhost:20080
+basePath: /
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+securityDefinitions:
+  basicAuth:
+    type: basic
+  tokenAuth:
+    type: apiKey
+    in: header
+    name: Authorization
+  apikeyAuth:
+    type: apiKey
+    in: header
+    name: X-API-KEY
+paths:
+  /swagger:
+    get:
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: endpoints
+      x-automount: endpoints
+      tags:
+        - endpoints
+  /endpoints:
+    get:
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: endpoints
+      x-automount: endpoints
+      tags:
+        - endpoints
+  /irremocon-delete:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: irremocon-api
+      x-automount: irremocon-api
+      tags:
+        - irremocon-api
+  /irremocon-update:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: irremocon-api
+      x-automount: irremocon-api
+      tags:
+        - irremocon-api
+  /irremocon-call:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: irremocon-api
+      x-automount: irremocon-api
+      tags:
+        - irremocon-api
+  /irremocon-list:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: irremocon-api
+      x-automount: irremocon-api
+      tags:
+        - irremocon-api
+  /irremocon-start-register:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: irremocon-api
+      x-automount: irremocon-api
+      tags:
+        - irremocon-api
+  /irremocon-start-check:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: irremocon-api
+      x-automount: irremocon-api
+      tags:
+        - irremocon-api
+  /irremocon-switchbot-devicelist:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: irremocon-api
+      x-automount: irremocon-api
+      tags:
+        - irremocon-api
+  /notification-push-message:
+    post:
+      security:
+        - apikeyAuth: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              topic:
+                type: string
+              title:
+                type: string
+              body:
+                type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: notification-api
+      x-automount: notification-api
+      tags:
+        - notification-api
+  /notification-get-list:
+    post:
+      security:
+        - apikeyAuth: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              topic:
+                type: string
+              start:
+                type: integer
+              end:
+                type: integer
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: notification-api
+      x-automount: notification-api
+      tags:
+        - notification-api
+  /notification-delete-allmessage:
+    post:
+      security:
+        - apikeyAuth: []
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: notification-api
+      x-automount: notification-api
+      tags:
+        - notification-api
+  /udpsend-send:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: sendudp-api
+      x-automount: sendudp-api
+      tags:
+        - sendudp-api
+  /widget-add:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: widget-api
+      x-automount: widget-api
+      tags:
+        - widget-api
+  /widget-call:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: widget-api
+      x-automount: widget-api
+      tags:
+        - widget-api
+  /widget-delete:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: widget-api
+      x-automount: widget-api
+      tags:
+        - widget-api
+  /widget-update:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: widget-api
+      x-automount: widget-api
+      tags:
+        - widget-api
+  /widget-list:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: widget-api
+      x-automount: widget-api
+      tags:
+        - widget-api
+  /widget-list-uuid:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: widget-api
+      x-automount: widget-api
+      tags:
+        - widget-api
+  /widget-delete-uuid:
+    post:
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: object
+      operationId: widget-api
+      x-automount: widget-api
+      tags:
+        - widget-api
+definitions:
+  Empty:
+    type: object
+    title: Empty Schema
+  CommonRequest:
+    type: object
+  CommonResponse:
+    type: object
